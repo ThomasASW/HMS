@@ -1,0 +1,20 @@
+.layout {
+    height: 100vh;
+}
+
+.header {
+    position: sticky;
+    top: 0;
+    z-index: 9;
+    padding: 0;
+}
+
+.content {
+    overflow-y: scroll;
+}
+
+.footer {
+    position: sticky;
+    bottom: 0;
+    z-index: 9;
+}
