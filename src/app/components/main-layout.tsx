@@ -4,6 +4,7 @@ import { Layout } from 'antd';
 import styles from './main-layout.module.css'
 import Navigation from './navigation';
 import { usePathname } from 'next/navigation';
+import PageFooter from './footer';
 
 const { Header, Footer, Content } = Layout;
 
@@ -18,7 +19,7 @@ function MainLayout({ children }: { children: React.ReactNode }) {
                 </Header>}
             <Content className={styles.content}>{children}</Content>
             {pathname === "/login" || pathname === "/register" ?
-                <></> : <Footer className={styles.footer}>Footer</Footer>}
+                <></> : <Footer className={styles.footer}><PageFooter /></Footer>}
         </Layout>
     )
 }

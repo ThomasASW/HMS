@@ -26,12 +26,14 @@ export async function POST(request: Request, response: NextResponse) {
                     projection: projection
                 }
             );
-        console.log(user);
-        const token = jwt.sign({ userId: user?._id }, "mQ46qpFwfE1BHuqMC+qlm19qBAD9fVPgh28werwe3ASFlAfnKjM=", { expiresIn: "1d" });
-        cookies().set("token", token, {
-            maxAge: 60 * 60 * 24,
-            path: "/"
-        });
+        console.log("user - login", user);
+        if (user != null) {
+            const token = jwt.sign({ userId: user?._id }, "mQ46qpFwfE1BHuqMC+qlm19qBAD9fVPgh28werwe3ASFlAfnKjM=", { expiresIn: "1d" });
+            cookies().set("token", token, {
+                maxAge: 60 * 60 * 24,
+                path: "/"
+            });
+        }
         return NextResponse.json(JSON.stringify(user), { status: 200 });
     } catch (error) {
         console.log("Error fetching user");

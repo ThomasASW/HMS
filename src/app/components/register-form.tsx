@@ -37,7 +37,7 @@ function RegisterForm() {
         const response = await fetch(endpoint, options);
         const json = await response.json();
         if (json.insertedId !== "") {
-            push('/');
+            push('/hotels/list');
         }
     }
 

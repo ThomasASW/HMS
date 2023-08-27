@@ -26,6 +26,7 @@ function Navigation() {
     const [current, setCurrent] = useState('mail');
 
     useEffect(() => {
+        console.log(pathname);
         const path = pathname.substring(1);
         if (items?.map((item) => item?.key).includes(path)) {
             setCurrent(path)

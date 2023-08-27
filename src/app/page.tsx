@@ -1,13 +1,15 @@
 import { redirect } from "next/navigation";
-import getUser from "../../../lib/get-user";
-import LoginForm from "../components/login-form";
+import getUser from "../../lib/get-user";
 
 export default async function Page() {
 
     const user = await getUser();
-    if (user !== null) {
+    if (!user) {
+        redirect("/login")
+    } else {
         redirect("/hotels/list")
     }
 
-    return <LoginForm />
+    return <></>
+
 }

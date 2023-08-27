@@ -1,7 +1,13 @@
+import MainLayout from "../components/main-layout"
+
 export default function HotelLayout({
     children,
 }: {
     children: React.ReactNode
 }) {
-    return <div>{children}</div>
+    return (
+        <MainLayout>
+            {children}
+        </MainLayout>
+    )
 }

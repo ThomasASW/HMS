@@ -6,7 +6,7 @@ export default async function Page() {
 
     const user = await getUser();
     if (user) {
-        redirect("/hotels")
+        redirect("/hotels/list")
     }
 
     return <RegisterForm />
