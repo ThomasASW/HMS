@@ -21,35 +21,35 @@ function HotelDetailsForm({ next }: HotelDetailsFormProps) {
 
     const options: SelectProps['options'] = [
         {
-            value: "free_WiFi",
+            value: "Free Wifi",
             label: "Free Wifi",
         },
         {
-            value: "pool",
+            value: "Pool",
             label: "Pool",
         },
         {
-            value: "parking",
+            value: "Parking",
             label: "Parking",
         },
         {
-            value: "ac",
+            value: "A/C",
             label: "A/C",
         },
         {
-            value: "gym",
+            value: "Gym",
             label: "Gym",
         },
         {
-            value: "room_service",
+            value: "Room service",
             label: "Room service",
         },
         {
-            value: "sauna",
+            value: "Sauna",
             label: "Sauna",
         },
         {
-            value: "wheelchair_accessible",
+            value: "Wheelchair Accessible",
             label: "Wheelchair Accessible",
         },
     ];
@@ -131,6 +131,63 @@ function HotelDetailsForm({ next }: HotelDetailsFormProps) {
             <Form.Item label="Description" tooltip="This field is required" name='description' rules={[{ required: true }]}>
                 <TextArea allowClear placeholder='Description of the hotel' />
             </Form.Item>
+            <Row gutter={10}>
+                <Col span={6}>
+                    <Form.Item
+                        name="address"
+                        label="Address"
+                        validateTrigger={['onChange', 'onBlur']}
+                        rules={[
+                            {
+                                required: true,
+                                whitespace: true,
+                                message: "Please input address.",
+                            },
+                        ]}
+                    >
+                        <Input placeholder="Address" />
+                    </Form.Item>
+                </Col>
+                <Col span={6}>
+                    <Form.Item
+                        name="city"
+                        label="City"
+                        validateTrigger={['onChange', 'onBlur']}
+                        rules={[
+                            {
+                                required: true,
+                                whitespace: true,
+                                message: "Please input address.",
+                            },
+                        ]}
+                    >
+                        <Input placeholder="City" />
+                    </Form.Item>
+                </Col>
+                <Col span={6}>
+                    <Form.Item label="State"
+                        rules={[
+                            {
+                                required: true
+                            }
+                        ]}
+                        name="state"
+                    >
+                        <Input placeholder='State' style={{ width: "100%" }} />
+                    </Form.Item>
+                </Col>
+                <Col span={6}>
+                    <Form.Item label="Country"
+                        rules={[
+                            {
+                                required: true
+                            }
+                        ]}
+                        name="country">
+                        <Input placeholder='Country' style={{ width: "100%" }} />
+                    </Form.Item>
+                </Col>
+            </Row>
             <Form.Item label="Pets allowed" tooltip="This field is required" name='pets' rules={[{ required: true }]}>
                 <Radio.Group>
                     <Radio value="yes">Yes</Radio>
@@ -209,6 +266,15 @@ function HotelDetailsForm({ next }: HotelDetailsFormProps) {
                                                     ]}
                                                     name={[name, "nor"]}>
                                                     <InputNumber placeholder='Number of rooms' style={{ width: "100%" }} />
+                                                </Form.Item>
+                                                <Form.Item label="Price per day" {...restField}
+                                                    rules={[
+                                                        {
+                                                            required: true
+                                                        }
+                                                    ]}
+                                                    name={[name, "price"]}>
+                                                    <InputNumber placeholder='Price per day' style={{ width: "100%" }} />
                                                 </Form.Item>
                                                 <Button
                                                     type="primary"

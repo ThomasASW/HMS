@@ -14,13 +14,29 @@ const ImageDescForm = (({ id, fileUrls }: ImageDescFormProps) => {
     const { push } = useRouter();
     const [form] = Form.useForm();
     const values = Form.useWatch([], form);
-    const [roomCount, setRoomCount] = useState(0)
+    const [canSubmit, setCanSubmit] = useState(false)
+    const [uploading, setUploading] = useState(false)
     const [isRoom, setIsRoom] = useState<boolean[]>([])
     const [selectOptions, setSelectOptions] = useState<DefaultOptionType[]>([])
+    const defaultOption: DefaultOptionType[] = [{
+        label: "Select a room",
+        value: "-1"
+    }]
 
     useEffect(() => {
         getRoomCount();
     }, [])
+
+    useEffect(() => {
+        form.validateFields({ validateOnly: true }).then(
+            () => {
+                setCanSubmit(false);
+            },
+            () => {
+                setCanSubmit(true);
+            }
+        )
+    }, [values])
 
     const getRoomCount = async () => {
         const endpoint = '/api/hotels/get-room-count'
@@ -34,20 +50,20 @@ const ImageDescForm = (({ id, fileUrls }: ImageDescFormProps) => {
         const response = await fetch(endpoint, options);
         const json = JSON.parse(await response.json());
         if (json != null) {
-            setRoomCount(json.roomCount);
+            let sOptions: DefaultOptionType[] = []
+            for (let i = 0; i < json.roomCount; i++) {
+                sOptions.push({
+                    label: `Room #${i + 1}`,
+                    value: (i + 1).toString()
+                })
+            }
+            setSelectOptions(sOptions);
+            setIsRoom(Array(json.roomCount).fill(false))
         }
-        let sOptions: DefaultOptionType[] = []
-        for (let i = 0; i < json.roomCount; i++) {
-            sOptions.push({
-                label: `Room #${i + 1}`,
-                value: (i + 1).toString()
-            })
-        }
-        setSelectOptions(sOptions);
-        setIsRoom(Array(json.roomCount).fill(false))
     }
 
     const finish = async (values: any) => {
+        setUploading(true);
         console.log(values);
         let metas: HotelImage[] = []
         for (let i = 0; i < values.imageType.length; i++) {
@@ -72,6 +88,7 @@ const ImageDescForm = (({ id, fileUrls }: ImageDescFormProps) => {
         if (json.message == "Success") {
             push("list");
         }
+        setUploading(false);
     }
 
     const handleChange = (e: RadioChangeEvent, index: number) => {
@@ -101,6 +118,7 @@ const ImageDescForm = (({ id, fileUrls }: ImageDescFormProps) => {
                         <Col span={12}>
                             <Form.Item
                                 name={["imageDesc", index]}
+                                rules={[{ required: true }]}
                                 label="Image description"
                             >
                                 <Input allowClear placeholder='Image description' />
@@ -108,6 +126,7 @@ const ImageDescForm = (({ id, fileUrls }: ImageDescFormProps) => {
                             <Form.Item
                                 name={["imageType", index]}
                                 label="Image type"
+                                rules={[{ required: true }]}
                             >
                                 <Radio.Group
                                     onChange={(e: RadioChangeEvent) => handleChange(e, index)}
@@ -123,7 +142,8 @@ const ImageDescForm = (({ id, fileUrls }: ImageDescFormProps) => {
                             >
                                 <Select
                                     allowClear
-                                    options={selectOptions}
+                                    defaultActiveFirstOption={true}
+                                    options={isRoom[index] ? selectOptions : defaultOption}
                                 />
                             </Form.Item>
                         </Col>
@@ -131,7 +151,12 @@ const ImageDescForm = (({ id, fileUrls }: ImageDescFormProps) => {
                 ))}
             </Form.Item>
             <Form.Item>
-                <Button type="primary" block htmlType="submit">
+                <Button
+                    type="primary"
+                    block
+                    disabled={canSubmit}
+                    loading={uploading}
+                    htmlType="submit">
                     Submit
                 </Button>
             </Form.Item>

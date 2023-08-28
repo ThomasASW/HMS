@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import getUser from "../../../../lib/get-user";
+import HotelList from "@/app/components/hotel-list";
 
 export default async function Page() {
 
@@ -8,6 +9,6 @@ export default async function Page() {
         redirect("/login")
     }
 
-    return <></>
+    return <HotelList />
 
 }

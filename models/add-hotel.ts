@@ -5,6 +5,10 @@ export default class AddHotel {
     constructor(
         public name: string,
         public description: string,
+        public address: string,
+        public city: string,
+        public state: string,
+        public country: string,
         public pets: boolean,
         public amenities: string[],
         public roomCount: number,

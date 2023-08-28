@@ -5,5 +5,6 @@ export default class AddRoom {
         public sleeps: number,
         public area: number,
         public nor: number,
+        public price: number
     ) { }
 }

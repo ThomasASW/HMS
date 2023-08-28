@@ -28,7 +28,7 @@ export async function POST(request: Request, response: NextResponse) {
             );
         console.log("user - login", user);
         if (user != null) {
-            const token = jwt.sign({ userId: user?._id }, "mQ46qpFwfE1BHuqMC+qlm19qBAD9fVPgh28werwe3ASFlAfnKjM=", { expiresIn: "1d" });
+            const token = jwt.sign({ userId: user?._id, role: user?.role }, "mQ46qpFwfE1BHuqMC+qlm19qBAD9fVPgh28werwe3ASFlAfnKjM=", { expiresIn: "1d" });
             cookies().set("token", token, {
                 maxAge: 60 * 60 * 24,
                 path: "/"

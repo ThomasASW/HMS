@@ -1,9 +1,11 @@
 import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
 import clientPromise from "./mongodb";
+import { ObjectId } from "mongodb";
 
 interface JwtPayload {
-    userId: string
+    userId: string,
+    role: string
 }
 
 export default async function getUser() {
@@ -18,14 +20,24 @@ export default async function getUser() {
                 .collection("users")
                 .findOne(
                     {
-                        email: data.userId,
+                        _id: new ObjectId(data.userId),
+                    },
+                    {
+                        projection: {
+                            _id: 1, email: 1, role: 1
+                        }
                     }
                 );
-            return JSON.stringify(user);
+            if (user !== null) {
+                return JSON.stringify(user);
+            } else {
+                return null
+            }
         } else {
             return null;
         }
     } catch (error) {
+        console.log(error);
         return null;
     }
 }
