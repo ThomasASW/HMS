@@ -52,7 +52,13 @@ function LoginForm() {
     const response = await fetch(endpoint, options);
     const json = await response.json();
     if (json !== "null") {
-      push("/hotels/list");
+      const user = JSON.parse(json);
+      localStorage.setItem("role", user.role)
+      if (user.role != "admin") {
+        push("/hotels/list");
+      } else {
+        push("/hotels/admin/list");
+      }
     } else {
       setError("Invalid credentials");
       setLoading(false);

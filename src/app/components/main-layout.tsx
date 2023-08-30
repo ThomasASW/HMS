@@ -20,15 +20,15 @@ function MainLayout({ children }: { children: React.ReactNode }) {
                     <Navigation />
                 </Header>}
             <Layout hasSider>
-                <Sider width={pathname == "/hotels/list" ? 300 : 0} style={{ padding: "5px", backgroundColor: "inherit", position: "fixed", top: "64px", left: "0", bottom: "67px", height: `calc(100% - 67px - 64px)` }}>
-                    {pathname == "/hotels/list" ? <FilterSidebar /> : <></>}
+                <Sider width={["/hotels/list", "/hotels/admin/list"].includes(pathname) ? 300 : 0} style={{ padding: "5px", backgroundColor: "inherit", position: "fixed", top: "64px", left: "0", bottom: "67px", height: `calc(100% - 67px - 64px)` }}>
+                    {["/hotels/list", "/hotels/admin/list"].includes(pathname) ? <FilterSidebar /> : <></>}
                 </Sider>
                 <Content style={{
                     padding: "5px",
                     height: `calc(100% - 67px - 64px)`,
-                    width: pathname == "/hotels/list" ? "calc(100% - 300px)" : "100%",
+                    width: ["/hotels/list", "/hotels/admin/list"].includes(pathname) ? "calc(100% - 300px)" : "100%",
                     position: "fixed",
-                    left: pathname == "/hotels/list" ? "300px" : "0",
+                    left: ["/hotels/list", "/hotels/admin/list"].includes(pathname) ? "300px" : "0",
                     top: "64px",
                     overflowY: "scroll"
                 }}>{children}</Content>

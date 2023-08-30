@@ -13,5 +13,6 @@ export default interface Hotel {
     pets: boolean,
     amenities: string[],
     roomCount: number,
+    rooms: AddRoom[],
     images: HotelImage[],
 }
