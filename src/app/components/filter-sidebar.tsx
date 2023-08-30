@@ -2,6 +2,7 @@ import { Button, Card, Form, Input, Select } from 'antd'
 import React, { useEffect, useState } from 'react'
 import { DefaultOptionType } from 'antd/es/select';
 import { Filter, filterSlice, useDispatch } from '../../../redux';
+import APIService from '../services/API-Service';
 
 function FilterSidebar() {
 
@@ -11,45 +12,43 @@ function FilterSidebar() {
     const [states, setStates] = useState<DefaultOptionType[]>([])
 
     useEffect(() => {
-        fetch("/api/hotels/get-country-list", {
-            method: "POST",
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        }).then((response) => {
-            response.json()
-                .then((json) => {
-                    const countryList: string[] = JSON.parse(json);
-                    let countrySelectProps: DefaultOptionType[] = []
-                    countryList.forEach((country) => {
-                        countrySelectProps.push({
-                            label: country,
-                            value: country
-                        })
-                    })
-                    setCountries(countrySelectProps)
-                })
-        })
-        fetch("/api/hotels/get-state-list", {
-            method: "POST",
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        }).then((response) => {
-            response.json()
-                .then((json) => {
-                    const stateList: string[] = JSON.parse(json);
-                    let stateSelectProps: DefaultOptionType[] = []
-                    stateList.forEach((state) => {
-                        stateSelectProps.push({
-                            label: state,
-                            value: state
-                        })
-                    })
-                    setStates(stateSelectProps)
-                })
-        })
+        getCountryList();
+        getStateList();
     }, [])
+
+    const getCountryList = async () => {
+        const response = await APIService.getCountryList();
+        console.log(response);
+        if (response.status == 200) {
+            const json = await response.json();
+            const countryList: string[] = JSON.parse(json);
+            let countrySelectProps: DefaultOptionType[] = []
+            countryList.forEach((country) => {
+                countrySelectProps.push({
+                    label: country,
+                    value: country
+                })
+            })
+            setCountries(countrySelectProps);
+        }
+    }
+
+    const getStateList = async () => {
+        const response = await APIService.getStateList();
+        console.log(response);
+        if (response.status == 200) {
+            const json = await response.json();
+            const stateList: string[] = JSON.parse(json);
+            let stateSelectProps: DefaultOptionType[] = []
+            stateList.forEach((state) => {
+                stateSelectProps.push({
+                    label: state,
+                    value: state
+                })
+            })
+            setStates(stateSelectProps);
+        }
+    }
 
     const filter = (values: Filter) => {
         dispatch(

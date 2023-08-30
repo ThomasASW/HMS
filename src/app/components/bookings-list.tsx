@@ -2,11 +2,11 @@
 
 import React, { ReactNode, useEffect, useState } from 'react';
 import { Button, Card, Carousel, Image, List, Row, Typography } from 'antd';
-import { useRouter } from 'next/navigation';
 import Hotel from '../../../models/hotel';
 import Title from 'antd/es/typography/Title';
 import Bookings from '../../../models/bookings';
 import { format } from 'date-fns';
+import APIService from '../services/API-Service';
 
 const { Text } = Typography;
 
@@ -21,29 +21,15 @@ function BookingsList({ user }: { user: string }) {
     }, [])
 
     const getBookingsList = async () => {
-        const endpoint = '/api/hotels/get-user-bookings'
-        const options = {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                id: (JSON.parse(user))._id,
-            }),
+        const response = await APIService.getUserBookings(user);
+        if (response.status == 200) {
+            const json = await response.json();
+            const userBookings = JSON.parse(json)
+            console.log(userBookings);
+            setHotelList(userBookings.hotels)
+            setBookingsList(userBookings.bookings)
+            setLoading(false);
         }
-        fetch(endpoint, options)
-            .then((response) => {
-                response
-                    .json()
-                    .then((json) => {
-                        const hotelPage = JSON.parse(json);
-                        console.log(hotelPage);
-                        setHotelList(hotelPage.hotels)
-                        setBookingsList(hotelPage.bookings)
-                        setLoading(false);
-                    }
-                    )
-            })
     }
 
     const getImages = (booking: Bookings): ReactNode => {
@@ -72,27 +58,11 @@ function BookingsList({ user }: { user: string }) {
 
     const cancel = async (booking: Bookings) => {
         setLoading(true);
-        const endpoint = '/api/hotels/cancel-booking'
-        const options = {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                id: booking._id,
-            }),
+        const response = await APIService.cancelBooking(booking);
+        console.log(response);
+        if (response.status == 200) {
+            getBookingsList();
         }
-        fetch(endpoint, options)
-            .then((response) => {
-                response
-                    .json()
-                    .then((json) => {
-                        const result = JSON.parse(json);
-                        console.log(result);
-                        getBookingsList();
-                    }
-                    )
-            })
     }
 
     return (

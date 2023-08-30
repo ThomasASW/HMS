@@ -8,6 +8,7 @@ import Hotel from '../../../models/hotel';
 import AddRoom from '../../../models/add-room';
 import Title from 'antd/es/typography/Title';
 import { useRouter } from 'next/navigation';
+import APIService from '../services/API-Service';
 
 const { Text } = Typography;
 const { RangePicker } = DatePicker;
@@ -48,53 +49,23 @@ function RoomList({ user }: { user: string }) {
     }
 
     const getHotelDetails = async () => {
-        const endpoint = '/api/hotels/get-hotel'
-        const options = {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                id: storage.hotelId
-            }),
+        const response = await APIService.getHotelDetails(storage)
+        if (response.status == 200) {
+            const json = await response.json()
+            const hotel = JSON.parse(json);
+            console.log(hotel);
+            setHotel(hotel);
         }
-        fetch(endpoint, options)
-            .then((response) => {
-                response
-                    .json()
-                    .then((json) => {
-                        const hotel = JSON.parse(json);
-                        console.log(hotel);
-                        setHotel(hotel);
-                    }
-                    )
-            })
     }
 
     const getRoomList = async () => {
-        const endpoint = '/api/hotels/get-hotel-rooms'
-        const options = {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                id: storage.hotelId,
-                dates: dates,
-                peopleCount: peopleCount
-            }),
+        const response = await APIService.getRoomList(storage, dates, peopleCount)
+        if (response.status == 200) {
+            const json = await response.json()
+            const room = JSON.parse(json);
+            console.log(room);
+            setRoomList(room.rooms)
         }
-        fetch(endpoint, options)
-            .then((response) => {
-                response
-                    .json()
-                    .then((json) => {
-                        const room = JSON.parse(json);
-                        console.log(room);
-                        setRoomList(room.rooms)
-                    }
-                    )
-            })
     }
 
     const pickDates = (value: any, dateString: [string, string]) => {
@@ -112,30 +83,13 @@ function RoomList({ user }: { user: string }) {
     }
 
     const book = async (roomNumber: number) => {
-        const endpoint = '/api/hotels/book-room'
-        const options = {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                hotelId: storage.hotelId,
-                roomNumber: roomNumber,
-                startDate: dates[0],
-                endDate: dates[1],
-                peopleCount: peopleCount,
-                user: (JSON.parse(user))._id
-            }),
+        const response = await APIService.bookRoom(storage, dates, roomNumber, peopleCount, user)
+        if (response.status == 200) {
+            const json = await response.json()
+            if (json.insertedId != "") {
+                push("bookings")
+            }
         }
-        fetch(endpoint, options)
-            .then((response) => {
-                response.json()
-                    .then((json) => {
-                        if (json.insertedId != "") {
-                            push("bookings")
-                        }
-                    })
-            })
     }
 
     return (

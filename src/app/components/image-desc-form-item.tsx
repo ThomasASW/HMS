@@ -3,6 +3,7 @@ import { Button, Col, Form, Image, Input, Radio, RadioChangeEvent, Row, Select }
 import { DefaultOptionType } from 'antd/es/select';
 import HotelImage from '../../../models/hotel-images';
 import { useRouter } from 'next/navigation';
+import APIService from '../services/API-Service';
 
 export interface ImageDescFormProps {
     id: string,
@@ -39,26 +40,20 @@ const ImageDescForm = (({ id, fileUrls }: ImageDescFormProps) => {
     }, [values])
 
     const getRoomCount = async () => {
-        const endpoint = '/api/hotels/get-room-count'
-        const options = {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ id }),
-        }
-        const response = await fetch(endpoint, options);
-        const json = JSON.parse(await response.json());
-        if (json != null) {
-            let sOptions: DefaultOptionType[] = []
-            for (let i = 0; i < json.roomCount; i++) {
-                sOptions.push({
-                    label: `Room #${i + 1}`,
-                    value: (i + 1).toString()
-                })
+        const response = await APIService.getRoomCount(id)
+        if (response.status == 200) {
+            const json = JSON.parse(await response.json());
+            if (json != null) {
+                let sOptions: DefaultOptionType[] = []
+                for (let i = 0; i < json.roomCount; i++) {
+                    sOptions.push({
+                        label: `Room #${i + 1}`,
+                        value: (i + 1).toString()
+                    })
+                }
+                setSelectOptions(sOptions);
+                setIsRoom(Array(json.roomCount).fill(false))
             }
-            setSelectOptions(sOptions);
-            setIsRoom(Array(json.roomCount).fill(false))
         }
     }
 
@@ -75,18 +70,12 @@ const ImageDescForm = (({ id, fileUrls }: ImageDescFormProps) => {
             })
         }
         console.log(metas);
-        const endpoint = '/api/hotels/add-image-metadata'
-        const options = {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ metadata: metas, id: id }),
-        }
-        const response = await fetch(endpoint, options);
-        const json = await response.json();
-        if (json.message == "Success") {
-            push("list");
+        const response = await APIService.addImageMetadata(id, metas)
+        if (response.status == 200) {
+            const json = await response.json();
+            if (json.message == "Success") {
+                push("list");
+            }
         }
         setUploading(false);
     }

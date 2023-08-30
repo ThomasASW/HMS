@@ -1,12 +1,13 @@
 'use client'
 
 import React, { ReactNode, useEffect, useState } from 'react';
-import { Button, Card, Carousel, Col, Image, List, Row, Space, Tag, Typography } from 'antd';
+import { Card, Carousel, Col, Image, List, Row, Space, Tag, Typography } from 'antd';
 import Hotel from '../../../models/hotel';
 import Title from 'antd/es/typography/Title';
 import Bookings from '../../../models/bookings';
 import { format } from 'date-fns';
 import { getStorage, useSelector } from '../../../redux';
+import APIService from '../services/API-Service';
 
 const { Text } = Typography;
 
@@ -22,29 +23,21 @@ function HotelBookingsList({ user }: { user: string }) {
     }, [])
 
     const getBookingsList = async () => {
-        const endpoint = '/api/hotels/get-hotel-bookings'
-        const options = {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                id: hotel.hotelId,
-            }),
+        const response = await APIService.getHotelBookings(hotel)
+        console.log(response);
+        if (response.status == 200) {
+            const json = await response.json();
+            const hotelBookings = JSON.parse(json);
+            setHotelDetails(hotelBookings.hotel)
+            setBookingsList(hotelBookings.bookings)
+            setLoading(false)
         }
-        fetch(endpoint, options)
-            .then((response) => {
-                response
-                    .json()
-                    .then((json) => {
-                        const hotelPage = JSON.parse(json);
-                        console.log(hotelPage);
-                        setHotelDetails(hotelPage.hotel)
-                        setBookingsList(hotelPage.bookings)
-                        setLoading(false);
-                    }
-                    )
-            })
+    }
+
+    const getRoomName = (booking: Bookings): ReactNode => {
+        return hotelDetails?.rooms.filter((room) => room.roomNumber == booking.roomNumber).map((room, index) => (
+            <Title style={{ marginTop: "0" }} key={index} level={3}>{room.desc}</Title>
+        ))
     }
 
     return (
@@ -57,7 +50,7 @@ function HotelBookingsList({ user }: { user: string }) {
                         <Carousel
                             autoplay
                         >
-                            {hotel?.images.filter((image) => image.imageType == "hotel").map((image, index) => (
+                            {hotelDetails?.images.filter((image) => image.imageType == "hotel").map((image, index) => (
                                 <Image
                                     height={281}
                                     key={index}
@@ -70,17 +63,17 @@ function HotelBookingsList({ user }: { user: string }) {
                 </Col>
                 <Col span={11}>
                     <Row>
-                        <Title style={{ marginTop: "10px", marginBottom: "6px" }} level={2}>{hotel?.name}</Title>
+                        <Title style={{ marginTop: "10px", marginBottom: "6px" }} level={2}>{hotelDetails?.name}</Title>
                     </Row>
                     <Row>
-                        <Text style={{ marginBottom: "10px" }}>{hotel?.description}</Text>
+                        <Text style={{ marginBottom: "10px" }}>{hotelDetails?.description}</Text>
                     </Row>
                     <Row>
-                        <Text type='secondary'>{`${hotel?.address}, ${hotel?.city}, ${hotel?.state}, ${hotel?.country}`}</Text>
+                        <Text type='secondary'>{`${hotelDetails?.address}, ${hotelDetails?.city}, ${hotelDetails?.state}, ${hotelDetails?.country}`}</Text>
                     </Row>
                     <Row style={{ marginTop: "10px" }}>
                         <Space direction='horizontal' wrap>
-                            {hotel?.amenities.map((amenity, index) => (
+                            {hotelDetails?.amenities.map((amenity, index) => (
                                 <Tag key={index}>{amenity}</Tag>
                             ))}
                         </Space>
@@ -108,7 +101,14 @@ function HotelBookingsList({ user }: { user: string }) {
                                         <Carousel
                                             autoplay
                                         >
-                                            {getImages(item)}
+                                            {hotelDetails?.images.filter((image) => image.imageType == "room").map((image, index) => (
+                                                <Image
+                                                    height={197}
+                                                    key={index}
+                                                    alt={image.imageDesc}
+                                                    src={image.imageURL}
+                                                />
+                                            ))}
                                         </Carousel>
                                     </div>
                                 }
@@ -117,21 +117,8 @@ function HotelBookingsList({ user }: { user: string }) {
                                     {getRoomName(item)}
                                 </Row>
                                 <Row>
-                                    {getHotelName(item)}
-                                </Row>
-                                <Row>
                                     {format(new Date(item.startDate), "dd-MM-yyyy") + "-> " + format(new Date(item.endDate), "dd-MM-yyyy")}
                                 </Row>
-                                {item.startDate > new Date().getTime() ?
-                                    < Button
-                                        style={{ marginTop: "8px" }}
-                                        type='primary'
-                                        block
-                                        onClick={() => cancel(item)}
-                                    >
-                                        Cancel
-                                    </Button> : <></>
-                                }
                             </Card>
                         </List.Item>
                     )

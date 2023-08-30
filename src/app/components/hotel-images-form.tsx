@@ -1,7 +1,7 @@
 import { InboxOutlined } from "@ant-design/icons";
 import { Button, Upload, UploadFile, UploadProps } from "antd";
 import { useEffect, useState } from "react"
-import { RcFile } from "antd/es/upload";
+import APIService from "../services/API-Service";
 
 const { Dragger } = Upload;
 
@@ -46,29 +46,13 @@ function HotelImagesForm({ next, id }: HotelImagesFormProps) {
     }, [uploading])
 
     const handleUpload = async () => {
-        const formData = new FormData();
-        fileList.forEach((file) => {
-            formData.append("files[]", file as RcFile);
-        });
-        formData.append("hotelId", id);
-        const endpoint = '/api/hotels/upload-images'
-        const options = {
-            method: 'POST',
-            body: formData,
+        const response = await APIService.uploadHotelImages(id, fileList)
+        console.log(response);
+        if (response.status == 200) {
+            const json = await response.json()
+            next(json.fileUrls)
         }
-        fetch(endpoint, options)
-            .then((response) => {
-                response.json().then((json) => {
-                    if (response.status == 200) {
-                        setUploading(false);
-                        next(json.fileUrls);
-                    }
-                })
-            })
-            .catch((error) => {
-                console.log(error);
-                setUploading(false);
-            })
+        setUploading(false)
     }
 
     return (

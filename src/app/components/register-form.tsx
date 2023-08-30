@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { Card, Button, Form, Input } from 'antd';
 import { useRouter } from 'next/navigation';
 import AddUser from '../../../models/add-user';
+import APIService from '../services/API-Service';
 
 function RegisterForm() {
 
@@ -26,15 +27,7 @@ function RegisterForm() {
     const register = async (values: AddUser) => {
         console.log(values);
         values.role = "user";
-        const endpoint = '/api/users/register'
-        const options = {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(values),
-        }
-        const response = await fetch(endpoint, options);
+        const response = await APIService.register(values);
         const json = await response.json();
         if (json.insertedId !== "") {
             push('/hotels/list');

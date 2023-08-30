@@ -7,6 +7,7 @@ import Meta from 'antd/es/card/Meta';
 import { getFilter, storageSlice, useDispatch, useSelector } from '../../../redux';
 import { useRouter } from 'next/navigation';
 import { ObjectId } from 'mongodb';
+import APIService from '../services/API-Service';
 
 function HotelList() {
 
@@ -24,33 +25,15 @@ function HotelList() {
     }, [pageNumber, pageSize, filter])
 
     const getHotelList = async () => {
-        const endpoint = '/api/hotels/get-paginated-hotel-list'
-        const options = {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                pageSize: pageSize,
-                pageNumber: pageNumber,
-                name: filter.name,
-                address: filter.address,
-                state: filter.state,
-                country: filter.country
-            }),
+        const response = await APIService.getPaginatedHotelList(pageSize, pageNumber, filter);
+        console.log(response);
+        if (response.status == 200) {
+            const json = await response.json();
+            const hotelPage = JSON.parse(json);
+            setHotelList(hotelPage.hotels)
+            setTotal(hotelPage.total)
+            setLoading(false)
         }
-        fetch(endpoint, options)
-            .then((response) => {
-                response
-                    .json()
-                    .then((json) => {
-                        const hotelPage = JSON.parse(json);
-                        setHotelList(hotelPage.hotels)
-                        setTotal(hotelPage.total)
-                        setLoading(false)
-                    }
-                    )
-            })
     }
 
     const viewDetails = (id: ObjectId) => {

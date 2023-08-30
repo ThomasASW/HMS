@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { Card, Button, Form, Input } from 'antd';
 import { useRouter } from 'next/navigation';
 import { notificationSlice, useDispatch } from '../../../redux';
+import APIService from '../services/API-Service';
 
 function LoginForm() {
 
@@ -41,27 +42,21 @@ function LoginForm() {
   }, [error])
 
   const login = async () => {
-    const endpoint = '/api/users/login'
-    const options = {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ email, password }),
-    }
-    const response = await fetch(endpoint, options);
-    const json = await response.json();
-    if (json !== "null") {
-      const user = JSON.parse(json);
-      localStorage.setItem("role", user.role)
-      if (user.role != "admin") {
-        push("/hotels/list");
+    const response = await APIService.login(email, password)
+    if (response.status == 200) {
+      const json = await response.json();
+      if (json !== "null") {
+        const user = JSON.parse(json);
+        localStorage.setItem("role", user.role)
+        if (user.role != "admin") {
+          push("/hotels/list");
+        } else {
+          push("/hotels/admin/list");
+        }
       } else {
-        push("/hotels/admin/list");
+        setError("Invalid credentials");
+        setLoading(false);
       }
-    } else {
-      setError("Invalid credentials");
-      setLoading(false);
     }
   }
 

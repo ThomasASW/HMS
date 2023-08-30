@@ -1,9 +1,10 @@
-import { Button, Form, Input, Radio, Select, SelectProps, message, Row, Col, Space, InputNumber } from 'antd';
+import { Button, Form, Input, Radio, Select, SelectProps, Row, Col, Space, InputNumber } from 'antd';
 import TextArea from 'antd/es/input/TextArea';
 import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
 import { useEffect, useState } from 'react';
 import AddHotel from '../../../models/add-hotel';
 import { notificationSlice, useDispatch } from '../../../redux';
+import APIService from '../services/API-Service';
 
 interface HotelDetailsFormProps {
     next: (id: string) => void
@@ -17,7 +18,6 @@ function HotelDetailsForm({ next }: HotelDetailsFormProps) {
     const [error, setError] = useState("");
     const [form] = Form.useForm();
     const values = Form.useWatch([], form);
-    const [messageApi, contextHolder] = message.useMessage();
 
     const options: SelectProps['options'] = [
         {
@@ -92,26 +92,16 @@ function HotelDetailsForm({ next }: HotelDetailsFormProps) {
         }
         hotel.images = [];
         console.log(hotel);
-        const endpoint = '/api/hotels/add-details'
-        const options = {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(values),
+        const response = await APIService.addHotel(hotel)
+        if (response.status != 200) {
+            const error = await response.json();
+            console.log(error);
+            setError(error);
+            setUploading(false);
+        } else {
+            const result = await response.json();
+            next(result.insertedId)
         }
-        fetch(endpoint, options)
-            .then((response) => {
-                response.json().then((json) => {
-                    const hotel = JSON.parse(json);
-                    next(hotel.insertedId)
-                });
-            })
-            .catch((error) => {
-                console.log(error);
-                setError(error);
-                setUploading(false);
-            });
     }
 
     const register = async (values: AddHotel) => {

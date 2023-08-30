@@ -6,8 +6,8 @@ import Hotel from '../../../models/hotel';
 import Meta from 'antd/es/card/Meta';
 import { getFilter, notificationSlice, storageSlice, useDispatch, useSelector } from '../../../redux';
 import { useRouter } from 'next/navigation';
-import { ObjectId } from 'mongodb';
 import { CalendarOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
+import APIService from '../services/API-Service';
 
 function HotelListAdmin({ user }: { user: string }) {
 
@@ -25,33 +25,15 @@ function HotelListAdmin({ user }: { user: string }) {
     }, [pageNumber, pageSize, filter])
 
     const getHotelList = async () => {
-        const endpoint = '/api/hotels/get-paginated-hotel-list'
-        const options = {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                pageSize: pageSize,
-                pageNumber: pageNumber,
-                name: filter.name,
-                address: filter.address,
-                state: filter.state,
-                country: filter.country
-            }),
+        const response = await APIService.getPaginatedHotelList(pageSize, pageNumber, filter);
+        console.log(response);
+        if (response.status == 200) {
+            const json = await response.json();
+            const hotelPage = JSON.parse(json);
+            setHotelList(hotelPage.hotels)
+            setTotal(hotelPage.total)
+            setLoading(false)
         }
-        fetch(endpoint, options)
-            .then((response) => {
-                response
-                    .json()
-                    .then((json) => {
-                        const hotelPage = JSON.parse(json);
-                        setHotelList(hotelPage.hotels)
-                        setTotal(hotelPage.total)
-                        setLoading(false)
-                    }
-                    )
-            })
     }
 
     const viewBookings = (hotel: Hotel) => {
@@ -65,36 +47,21 @@ function HotelListAdmin({ user }: { user: string }) {
 
     const deleteHotel = async (hotel: Hotel) => {
         setLoading(true);
-        const userDetails = JSON.parse(user);
-        const endpoint = '/api/hotels/delete-hotel'
-        const options = {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                hotelId: hotel._id,
-                userId: userDetails._id,
-            }),
+        const response = await APIService.deleteHotel(hotel, user)
+        console.log(response);
+        if (response.status == 200) {
+            const json = await response.json();
+            const result = JSON.parse(json);
+            console.log(result);
+            dispatch(
+                notificationSlice.actions.notify({
+                    content: "Deleted successfully",
+                    duration: 6,
+                    type: "success"
+                })
+            )
+            getHotelList();
         }
-        fetch(endpoint, options)
-            .then((response) => {
-                response
-                    .json()
-                    .then((json) => {
-                        const result = JSON.parse(json);
-                        console.log(result);
-                        dispatch(
-                            notificationSlice.actions.notify({
-                                content: "Deleted successfully",
-                                duration: 6,
-                                type: "success"
-                            })
-                        )
-                        getHotelList();
-                    }
-                    )
-            })
     }
 
     const editHotel = (hotel: Hotel) => {
