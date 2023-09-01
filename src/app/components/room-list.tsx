@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from 'react';
-import { Button, Card, Carousel, Col, DatePicker, Image, InputNumber, List, Row, Space, Tag, Typography } from 'antd';
+import { Button, Card, Carousel, Col, Image, InputNumber, List, Row, Space, Tag, Typography } from 'antd';
 import { getStorage, useSelector } from '../../../redux';
 import { parse } from 'date-fns';
 import Hotel from '../../../models/hotel';
@@ -9,9 +9,9 @@ import AddRoom from '../../../models/add-room';
 import Title from 'antd/es/typography/Title';
 import { useRouter } from 'next/navigation';
 import APIService from '../services/API-Service';
+import Calendar from './calendar';
 
 const { Text } = Typography;
-const { RangePicker } = DatePicker;
 
 function RoomList({ user }: { user: string }) {
 
@@ -137,7 +137,7 @@ function RoomList({ user }: { user: string }) {
             </Row>
             <Row style={{ paddingLeft: "14px", paddingRight: "14px" }} gutter={10}>
                 <Col span={12}>
-                    <RangePicker style={{ width: "100%" }} onChange={pickDates} />
+                    <Calendar hotelId={storage.hotelId} pickDates={pickDates} />
                 </Col>
                 <Col span={12}>
                     <InputNumber style={{ width: "100%" }} onChange={people} defaultValue={2} min={1} placeholder='People' />

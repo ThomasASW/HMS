@@ -1,7 +1,7 @@
 'use client'
 
 import React, { ReactNode, useEffect, useState } from 'react';
-import { Button, Card, Carousel, Image, List, Row, Typography } from 'antd';
+import { Button, Card, Carousel, Image, List, Popconfirm, Row, Typography } from 'antd';
 import Hotel from '../../../models/hotel';
 import Title from 'antd/es/typography/Title';
 import Bookings from '../../../models/bookings';
@@ -99,14 +99,20 @@ function BookingsList({ user }: { user: string }) {
                                 {format(new Date(item.startDate), "dd-MM-yyyy") + "-> " + format(new Date(item.endDate), "dd-MM-yyyy")}
                             </Row>
                             {item.startDate > new Date().getTime() ?
-                                < Button
-                                    style={{ marginTop: "8px" }}
-                                    type='primary'
-                                    block
-                                    onClick={() => cancel(item)}
+                                <Popconfirm
+                                    title="Confirm cancellation"
+                                    description="Are you sure you want to cancel this booking?"
+                                    onConfirm={() => cancel(item)}
                                 >
-                                    Cancel
-                                </Button> : <></>
+                                    < Button
+                                        style={{ marginTop: "8px" }}
+                                        type='primary'
+                                        block
+                                        danger
+                                    >
+                                        Cancel
+                                    </Button>
+                                </Popconfirm> : <></>
                             }
                         </Card>
                     </List.Item>

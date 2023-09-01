@@ -7,6 +7,7 @@ import { RcFile } from "antd/es/upload";
 import Hotel from "../../../models/hotel";
 import HotelImage from "../../../models/hotel-images";
 import AddUser from "../../../models/add-user";
+import { ObjectId } from "mongodb";
 
 const APIService = {
     getUserBookings: async (user: string): Promise<Response> => {
@@ -207,6 +208,20 @@ const APIService = {
                 id: storage.hotelId,
                 dates: dates,
                 peopleCount: peopleCount
+            }),
+        }
+        return fetch(endpoint, options);
+    },
+
+    getHotelBookedDates: async (hotelId: ObjectId | undefined): Promise<Response> => {
+        const endpoint = '/api/hotels/get-hotel-booked-dates'
+        const options = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                id: hotelId
             }),
         }
         return fetch(endpoint, options);

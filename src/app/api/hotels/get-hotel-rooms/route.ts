@@ -22,7 +22,7 @@ export async function POST(request: Request, response: Response) {
                         hotelId: requestBody.id,
                         $or: [
                             { startDate: { $gte: requestBody.dates[0] } },
-                            { endDate: { $lte: requestBody.dates[1] } }
+                            { endDate: { $lte: requestBody.dates[1], $gte: requestBody.dates[0] } }
                         ]
                     }]
                 },
