@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
 import clientPromise from "../../../../../lib/mongodb";
 import AddUser from "../../../../../models/add-user";
-import jwt from "jsonwebtoken";
-import { cookies } from "next/headers";
 
 export async function POST(request: Request, response: Response) {
     try {
@@ -22,8 +20,12 @@ export async function POST(request: Request, response: Response) {
                     email: requestBody.email
                 }
             );
-        console.log(userExist);
-        if (userExist) {
+        let users = []
+        for await (const doc of userExist) {
+            console.log(doc);
+            users.push(doc);
+        }
+        if (users.length != 0) {
             console.log("Email already in use");
             return NextResponse.json({}, { status: 422 });
         }
@@ -31,11 +33,6 @@ export async function POST(request: Request, response: Response) {
             .collection("users")
             .insertOne(requestBody);
         console.log(user);
-        const token = jwt.sign({ userId: user?.insertedId }, "mQ46qpFwfE1BHuqMC+qlm19qBAD9fVPgh28werwe3ASFlAfnKjM=", { expiresIn: "1d" });
-        cookies().set("token", token, {
-            maxAge: 60 * 60 * 24,
-            path: "/"
-        });
         return NextResponse.json(JSON.stringify(user), { status: 200 });
     } catch (error) {
         console.log("Error adding user");

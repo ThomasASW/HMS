@@ -57,6 +57,9 @@ function LoginForm() {
         setError("Invalid credentials");
         setLoading(false);
       }
+    } else {
+      setError("Server error");
+      setLoading(false);
     }
   }
 

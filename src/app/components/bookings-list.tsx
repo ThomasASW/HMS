@@ -17,6 +17,7 @@ function BookingsList({ user }: { user: string }) {
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
+        console.log(user);
         getBookingsList();
     }, [])
 

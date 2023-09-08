@@ -5,9 +5,11 @@ import { Card, Button, Form, Input } from 'antd';
 import { useRouter } from 'next/navigation';
 import AddUser from '../../../models/add-user';
 import APIService from '../services/API-Service';
+import { notificationSlice, useDispatch } from '../../../redux';
 
 function RegisterForm() {
 
+    const dispatch = useDispatch();
     const { push } = useRouter();
     const [form] = Form.useForm()
     const [canSubmit, setCanSubmit] = useState(false);
@@ -28,9 +30,19 @@ function RegisterForm() {
         console.log(values);
         values.role = "user";
         const response = await APIService.register(values);
-        const json = await response.json();
-        if (json.insertedId !== "") {
-            push('/hotels/list');
+        if (response.status == 200) {
+            const json = await response.json();
+            if (json.insertedId !== "") {
+                push('/login');
+            }
+        } else {
+            dispatch(
+                notificationSlice.actions.notify({
+                    content: "Could not register user",
+                    type: "error",
+                    duration: 6
+                })
+            )
         }
     }
 
