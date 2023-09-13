@@ -1,4 +1,3 @@
-import { DefaultOptionType } from "antd/es/select";
 import Bookings from "../../../models/bookings";
 import { Filter, Storage } from "../../../redux";
 import AddHotel from "../../../models/add-hotel";
