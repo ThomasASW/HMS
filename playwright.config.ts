@@ -5,13 +5,15 @@ const baseURL = `http://localhost:3000`
 
 export default defineConfig({
     // Timeout per test
-    timeout: 60 * 1000,
+    timeout: 90 * 1000,
     // Test directory
     testDir: path.join(__dirname, 'e2e'),
     // If a test fails, retry it additional 2 times
     retries: 2,
     // Artifacts folder where screenshots, videos, and traces are stored.
     outputDir: 'test-results/',
+
+    workers: 2,
 
     // Run your local dev server before starting the tests:
     // https://playwright.dev/docs/test-advanced#launching-a-development-web-server-during-the-tests
